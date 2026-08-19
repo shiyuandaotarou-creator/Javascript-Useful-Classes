@@ -1,0 +1,2 @@
+# Javascript-Useful-Classes
+Javascriptで使える便利クラスを入れます。他にも作ったクラスは入れてOK
