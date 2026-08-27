@@ -1,9 +1,17 @@
+import Help from 'https://cdn.jsdelivr.net/gh/shiyuandaotarou-creator/Javascript-Useful-Classes@main/misc/Help.js';
+const h = new Help("Timer","デルタタイムや条件に応じたカウントアップができます。")
 export default class Timer {
     #time;
     #previousTime;
     #deltaTime;
     #condition;
     constructor() {
+        h.m("Timer","初期化",["引数なし "]);
+        h.m("setCondition","カウントアップ条件を設定",[
+            "cond:カウントアップ条件 boolean "
+        ],"update()などで常時監視が必要")
+        h.m("t","カウントアップされた時間を表示",["引数なし "],"ミリ秒で取得")
+        h.m("dt","デルタタイムの取得",["requestFPS=false:trueの場合はFPSを返す "])
         this.#time = 0;
         this.#deltaTime = 0;
         this.#previousTime = 0;
@@ -13,6 +21,9 @@ export default class Timer {
  */
         this.ts = () => this.#time / 1000;
         this.#update();
+    }
+    help(){
+        h.helpShow();
     }
     /**
      * 条件が満たされたときカウントアップします。条件登録は常時監視してあげてください。
