@@ -65,7 +65,7 @@ export default class Help{
                 args += `   ${a}`;
                 args += "\n"
             }
-            args = args.slice(0,-2);
+            args = args.slice(0,-1);
             console.log(`%c[${c.about}]\n%c${c.name}%c\n${args}%c\n${c.description}`,
                 "font-size:13px;font-weight:700","color:yellow","","font-size:10.5px;font-style:italic"
             );
