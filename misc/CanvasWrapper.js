@@ -1,3 +1,5 @@
+import Help from 'https://cdn.jsdelivr.net/gh/shiyuandaotarou-creator/Javascript-Useful-Classes@main/misc/Help.js';
+const h = new Help("CanvasWrapper", "Canvasの便利機能をまとめました。点・折れ線・画像の描画ができます。");
 export default class CanvasWrapper {
     /**
      * 
@@ -13,53 +15,40 @@ export default class CanvasWrapper {
         this.ctx = this.canvas.getContext("2d");
         this.ctx.imageSmoothingEnabled = false;
         this.imageList = [];
+        h.m("addImage(link, pos, width, name = link, num)", "画像を登録", [
+            "link:画像のリンク ", "pos:中心座標 number[] ", "width:横幅", "name:画像の名前", "num:画像レイヤー "
+        ], "画像読み込み時に一回だけ実行。update()の中で実行しないでください")
+        h.m("editImage(name,input1,input2)", "画像を編集", ["name:編集する画像の名前。数字で渡した場合はその添字の部分を編集します。", "input1,input2:後述 "],
+            "input1,input2にはpos,widthのどちらかが入ります。配列で入れた部分がpos,数字で入れた部分がwidthとして認識されるので渡す順番は自由です。input2は必須ではありません。毎フレームeditImageを呼ぶ場合はeditImageのname引数にかならず'添字'を渡してください。添字はgetIndexで取得できます。(計算量が爆発するため)"
+        )
+        h.m("getIndex(name)","画像名から添字を取得",["name:画像名 "],"毎フレームeditImageを呼ぶ場合はeditImageのname引数にかならず添字を渡してください(計算量が爆発するため)")
+        h.m(" removeImage(name)", "画像登録を解除", ["name:登録を解除する画像の名前 "])
+        h.m("line(points, color) ", "折れ線を描画", ["points:通る点 number[][]", "close=false:閉路にするか", "color='red':線の色 "])
+        h.m("point(x, y, radius, color) ", "点を描画", ["x:中心のx座標", "y:中心のy座標", "radius=10:半径", "color='red':点の色 "])
+        h.m("clear()", "画面を消去", ["引数なし "])
+        h.m("grid(row, column) ", "グリッドを描画", ["row:行の数", "column:列の数 "])
+        h.m("drawUpdate(func, drawCond, imgCond, stopCond) ", "毎フレーム描画", [
+            "func:実行する関数", "drawCond=true:描画条件", "imgCond=true:画像描画条件", "stopCond=false:描画強制終了条件"
+        ], "内部でupdate()を実行するので一回だけ呼べば十分。\nimgCondはラムダ式で画像のレイヤーを受け取れます。\n各条件が時々刻々と変化する場合はラムダ式で渡してください")
     }
     help() {
-        console.log(
-            "%cCanvasWrapper使用方法\n%cこのクラスは、Canvasの便利機能をまとめたクラスです。点・折れ線・画像を描画できます。",
-            "font-size:15px;font-weight:700",""
-        );
-        console.log(
-            "[初期化方法]\n%cCanvasWrapper(width=500,height=500,canvasID='canvas')%c\nwidth:キャンバス解像度幅\nheight:キャンバス解像度高\ncanvasID:HTMLファイルののキャンバスID"
-            ,"color:yellow",""
-        );
-        console.log(
-            "[画像を登録]\n%caddImage(link,pos,width,name=link,num=0)%c\nlink:画像のリンク\npos:配列で中心座標\nwidth:幅\nname:画像名\nnum:画像レイヤー"
-            ,"color:yellow",""
-        );
-        console.log(
-            "[画像登録を解除]\n%cremoveImage(name)%c\nname:消去する画像名",
-            "color:yellow",""
-        );
-        console.log(
-            '[折れ線を引く]\n%cline(points, close = false, color = "red")%c\npoints:点の配列\nclose:閉路にするか\ncolor:線の色'
-            ,"color:yellow",""
-        )
-        console.log(
-            '[点を打つ]\n%cpoint(x, y, radius = 10, color = "red") %c\nx:点のx座標\ny:点のy座標\nradius:点の半径\ncolor:点の色'
-            ,"color:yellow",""
-        )
-        console.log(
-            '[グリッドを作る]\n%cgrid(row, column)%c\nrow:行の数\ncolumn:列の数'
-            ,"color:yellow",""
-        )
-        console.log(
-            '[画面を消去]\n%cclear()\n%c引数なし'
-            ,"color:yellow",""
-        )
-        console.log(
-            '[毎フレーム描画用update]\n%cdrawUpdate(func, drawCond = true, imgCond = true, stopCond = false)\n%cfunc:実行する関数\ndrawCond:描画する条件\nimgCond:画像を描画する条件。引数にレイヤー番号を受け取り可能。\nstopCond:この条件を満たしたらストップ'
-            ,"color:yellow",""
-        )
+        h.helpShow();
     }
-    drawImage(cond = true) {
+    getIndex(name){
+        for(let i in this.imageList){
+            if(this.imageList[i].name === name){
+                return Number(i);
+            }
+        }
+    }
+    drawImage(cond = () => true) {
         for (const c of this.imageList) {
             if (cond(c.class)) {
                 this.image(c.img, c.pos, c.width);
             }
         }
     }
-    addImage(link, pos, width, name = link, num = 0) {
+    addImage(link, pos, width, name = link, num = 0,func=()=>{}) {
         const img = new Image();
         img.src = link;
         img.onload = () => {
@@ -69,7 +58,42 @@ export default class CanvasWrapper {
                 "pos": pos,
                 "width": width,
                 "class": num,
-            })
+            });
+            func();
+        }
+    }
+    editImage(name, input1, input2) {
+        let pos, width;
+        if (Array.isArray(input1)) { //input1のほうがposの場合
+            pos = input1;
+            if (input2 !== undefined) {
+                width = input2;
+            }
+        } else {
+            width = input1;
+            if (input2 !== undefined) {
+                pos = input2;
+            }
+        }//pos,widthに内容を入力。かたっぽだけなら相方はundefined
+        if (typeof name === "string") {
+            for (const c of this.imageList) {
+                if (c.name === name) {
+                    if (pos !== undefined) {
+                        c.pos = pos;
+                    }
+                    if (width !== undefined) {
+                        c.width = width;
+                    }
+                }
+            }
+        } else if (typeof name === "number") {
+            const c = this.imageList[name]
+            if (pos !== undefined) {
+                c.pos = pos;
+            }
+            if (width !== undefined) {
+                c.width = width;
+            }
         }
     }
     removeImage(name) {
@@ -114,14 +138,14 @@ export default class CanvasWrapper {
             this.line([[0, i * height], [this.canvasWidth, i * height]]);
         }
     }
-    drawUpdate(func, drawCond = true, imgCond = true, stopCond = false) {
+    drawUpdate(func, drawCond = () => true, imgCond = () => true, stopCond = () => false) {
         const update = () => {
             if (drawCond()) {
                 this.clear();
                 this.drawImage(imgCond);
                 func();
             }
-            if (!stopCond) {
+            if (!stopCond()) {
                 requestAnimationFrame(update);
             }
         }
