@@ -80,7 +80,7 @@ export default class Help{
             "%c(メソッド)","font-size:15px"
         )
         console.log(
-            "[メソッドのヘルプを登録]\n%cm(methodName,methodAbout,methodArgs,methodDescription)%c\n   methodName:メソッド名\n   methodAbout:メソッドの概要\n   methodArgs:引数配列\n methodDescription:メソッドの詳細説明"
+            "[メソッドのヘルプを登録]\n%cm(methodName,methodAbout,methodArgs,methodDescription)%c\n   methodName:メソッド名\n   methodAbout:メソッドの概要\n   methodArgs:引数配列\n   methodDescription:メソッドの詳細説明"
             ,"color:yellow",""
         );
         console.log(
