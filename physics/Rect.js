@@ -7,7 +7,7 @@ export default class Rect {
      * @param {number[]} endPos 
      * @param {World} world 
      */
-    constructor(startPos = [0, 0], endPos = [1, 1], world = undefined, layer = 0, backgroundColor = "red") {
+    constructor(startPos = [0, 0], endPos = [1, 1], world = undefined, layer = 0, backgroundColor = "transparent") {
         this.layer = layer;
         this.hitTargetLayers = [layer];
         this.startPos = [ //正規化
