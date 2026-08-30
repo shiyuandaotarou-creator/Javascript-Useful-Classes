@@ -15,8 +15,10 @@ export default class CanvasWrapper {
         this.ctx = this.canvas.getContext("2d");
         this.ctx.imageSmoothingEnabled = false;
         this.imageList = [];
-        h.m("addImage(link, pos, width, name = link, num)", "画像を登録", [
-            "link:画像のリンク ", "pos:中心座標 number[] ", "width:横幅", "name:画像の名前", "num:画像レイヤー "
+        h.m("CanvasWrapper(width,height,canvasID)", "初期化", [
+            "width=500:横解像度 ", "height=500:縦解像度", "canvasID:キャンバスのHTMLID"]);
+        h.m("addImage(link, pos, width, name = link, num,func)", "画像を登録", [
+            "link:画像のリンク ", "pos:中心座標 number[] ", "width:横幅", "name:画像の名前", "num:画像レイヤー ","func:画像読込み時に実行する関数"
         ], "画像読み込み時に一回だけ実行。update()の中で実行しないでください")
         h.m("editImage(name,input1,input2)", "画像を編集", ["name:編集する画像の名前。数字で渡した場合はその添字の部分を編集します。", "input1,input2:後述 "],
             "input1,input2にはpos,widthのどちらかが入ります。配列で入れた部分がpos,数字で入れた部分がwidthとして認識されるので渡す順番は自由です。input2は必須ではありません。毎フレームeditImageを呼ぶ場合はeditImageのname引数にかならず'添字'を渡してください。添字はgetIndexで取得できます。(計算量が爆発するため)"
@@ -138,7 +140,7 @@ export default class CanvasWrapper {
             this.line([[0, i * height], [this.canvasWidth, i * height]]);
         }
     }
-    drawUpdate(func, drawCond = () => true, imgCond = () => true, stopCond = () => false) {
+    drawUpdate(func =()=>{}, drawCond = () => true, imgCond = () => true, stopCond = () => false) {
         const update = () => {
             if (drawCond()) {
                 this.clear();
