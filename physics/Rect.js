@@ -10,11 +10,11 @@ export default class Rect {
     constructor(startPos = [0, 0], endPos = [1, 1], world = undefined, layer = 0, backgroundColor = "transparent") {
         this.layer = layer;
         this.hitTargetLayers = [layer];
-        this.startPos = [ //正規化
+        this._startPos = [ //正規化
             Math.min(startPos[0], endPos[0]),
             Math.min(startPos[1], endPos[1])
         ];
-        this.endPos = [
+        this._endPos = [
             Math.max(startPos[0], endPos[0]),
             Math.max(startPos[1], endPos[1])
         ];
@@ -22,13 +22,13 @@ export default class Rect {
             this.world = world;
         }
         this._center = [
-            (this.startPos[0] + this.endPos[0]) / 2,
-            (this.startPos[1] + this.endPos[1]) / 2
+            (this._startPos[0] + this._endPos[0]) / 2,
+            (this._startPos[1] + this._endPos[1]) / 2
         ]
+        this._width = this._endPos[0] - this._startPos[0];
+        this._height = this._endPos[1] - this._startPos[1];
         this.canvas = world.canvas;
         this.ctx = this.canvas.getContext("2d");
-        this._width = this.endPos[0] - this.startPos[0];
-        this._height = this.endPos[1] - this.startPos[1];
         this.backgroundColor = backgroundColor;
         world.rectList.push(this)
         this.h = new Help("Rect", "長方形のテンプレートを作成します");
@@ -41,13 +41,13 @@ export default class Rect {
             "returnDirection=trueの場合は配列を返し、0番目に衝突したかのtrue/false,1番目にthisからみてrectがどこに衝突したかを返します"
         );
         this.h.m("getOverlaps(returnBoolean)", "重なっているRectすべてを返す", ["returnBoolean=false:これがtrueの場合は結果がtrue/falseで返ります"], "Worldの管理するrectListの中で判定します")
-        this.h.gs("center", "中心座標。渡すときは配列の形で渡す")
         this.h.gs("layer", "Rectのレイヤー")
         this.h.gs("backgroundColor", "長方形の背景色")
-        this.h.g("startPos", "開始座標");
-        this.h.g("endPos", "終了座標")
-        this.h.g("width", "幅");
-        this.h.g("height", "高さ")
+        this.h.gs("center", "中心座標。渡すときは配列の形で渡す。これ以下5つはどれかを調節すると自動調整されます。")
+        this.h.gs("startPos", "開始座標");
+        this.h.gs("endPos", "終了座標")
+        this.h.gs("width", "幅");
+        this.h.gs("height", "高さ")
     }
     help() {
         this.h.helpShow();
@@ -67,25 +67,57 @@ export default class Rect {
     }
     set width(width) {
         this._width = width;
-        this.startPos = [
+        this._startPos = [
             this._center[0] - this._width / 2,
             this._center[1] - this._height / 2
+        ];
+        this._endPos = [
+            this._center[0] + this._width / 2,
+            this._center[1] + this._height / 2
         ];
     }
     set height(height) {
         this._height = height;
-        this.startPos = [
+        this._startPos = [
             this._center[0] - this._width / 2,
             this._center[1] - this._height / 2
         ];
+        this._endPos = [
+            this._center[0] + this._width / 2,
+            this._center[1] + this._height / 2
+        ];
+    }
+    get startPos() {
+        return this._startPos
+    }
+    get endPos() {
+        return this._endPos
+    }
+    set startPos(startPos) {
+        this._startPos = startPos;
+        this._center = [
+            (this._startPos[0] + this._endPos[0]) / 2,
+            (this._startPos[1] + this._endPos[1]) / 2
+        ]
+        this._width = this._endPos[0] - this._startPos[0];
+        this._height = this._endPos[1] - this._startPos[1];
+    }
+    set endPos(endPos) {
+        this._endPos = endPos;
+        this._center = [
+            (this._startPos[0] + this._endPos[0]) / 2,
+            (this._startPos[1] + this._endPos[1]) / 2
+        ]
+        this._width = this._endPos[0] - this._startPos[0];
+        this._height = this._endPos[1] - this._startPos[1];
     }
     set center(centerPos) {
         this._center = centerPos;
-        this.startPos = [
+        this._startPos = [
             centerPos[0] - this._width / 2,
             centerPos[1] - this._height / 2
         ];
-        this.endPos = [
+        this._endPos = [
             centerPos[0] + this._width / 2,
             centerPos[1] + this._height / 2
         ]
