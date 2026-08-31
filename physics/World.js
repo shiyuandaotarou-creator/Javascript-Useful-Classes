@@ -3,6 +3,7 @@ export default class World {
         /** @type { HTMLCanvasElement } */
         this.canvas = document.getElementById(canvasId);
         this.rectList = [];
+        this.canvasId = canvasId;
         this.canvasWidth = width;
         this.canvasHeight = height;
         this.canvas.width = width;
